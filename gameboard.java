@@ -5,33 +5,18 @@ import java.util.Scanner;
 
 
 public class Gameboard {
-
-	// Declare constants
-	String EMPTY_SPACE = "0";
-	
-	// array to hold ships
-	//Ships[] ShipsArray = new Ships[5];
-	
-	// ships
-	/*
-	private int AIRCRAFT=5;
-	private int BATTLESHIP=4;
-	private int DESTROYER=3;
-	private int SUBMARINE=3;
-	private int PATROL=2;
-	*/
 	
 	// hits and misses
 	private int hits, misses;
-	private ArrayList<Integer> shipArray = new ArrayList<Integer>();
+	private ArrayList<Integer> shipLengthArray = new ArrayList<Integer>();
+	private ArrayList<Integer> shipCharArray = new ArrayList<Integer>();
 	int guess;
 	private int level;
 	private int availableMissiles;
 	private int boardSize;
-	private int[][] gameBoard;
-	//shipType[] ships = new shipType[5]; //
+	private char[][] gameBoard;
 	private int shipSize;
-	private char shipMarker;
+	private int shipMarker;
 	private int ship;
 	private String shipString;
 	private Ships ships;
@@ -51,10 +36,8 @@ public class Gameboard {
 	//}
 	
 
-	// initializing the whole board to -1
+	// initializing the whole board to empty ('E')
 	private void fillBoard() {
-		// initializing the board array to -1
-		// -1 will equal empty space, aka water on the battleship board
 		for(int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
 				gameBoard[i][j] = 'E';
@@ -127,7 +110,7 @@ public class Gameboard {
 				availableMissiles = 30;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Don't waste them.");
 				boardSize = 6;
-				gameBoard = new int[6][6];
+				gameBoard = new char[6][6];
 				
 			} else if (level == 2)
 			{
@@ -135,7 +118,7 @@ public class Gameboard {
 				availableMissiles = 50;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Best of luck!");
 				boardSize = 9;
-				gameBoard = new int[9][9];
+				gameBoard = new char[9][9];
 				
 			} else if (level == 3)
 			{
@@ -143,12 +126,12 @@ public class Gameboard {
 				availableMissiles = 75;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Put those skills to good use.");
 				boardSize = 12;
-				gameBoard = new int[12][12];
+				gameBoard = new char[12][12];
 			}
 			System.out.println();
 	}
 	
-	public void set(int[][] gameBoard){
+	public void set(char[][] gameBoard){
 		this.gameBoard=gameBoard;
 		return;
 	}
@@ -195,19 +178,22 @@ public class Gameboard {
 	
 	
 	public enum Ships {
-		AIRCRAFT (5, 'A', "Aircraft Carrier"),
-		BATTLESHIP (4, 'B', "Battleship"),
-		DESTROYER (3, 'D', "Destroyer"),
-		SUBMARINE (3, 'S', "Submarine"),
-		PATROL (2, 'P', "Patrol");
+		
+		// int shipMarker is later converted to char.
+		// these values are according to our getLetter method to convert to ascii values
+		AIRCRAFT (5, 1, "Aircraft Carrier"),
+		BATTLESHIP (4, 2, "Battleship"),
+		DESTROYER (3, 4, "Destroyer"),
+		SUBMARINE (3, 19, "Submarine"),
+		PATROL (2, 16, "Patrol");
 		
 		// instance fields
 		final int shipSize;
-		final char shipMarker;
+		final int shipMarker;
 		final String shipString;
 		
 		// enum constructor
-		Ships(int shipSize, char shipMarker, String shipString) {
+		Ships(int shipSize, int shipMarker, String shipString) {
 			this.shipSize = shipSize;
 			this.shipMarker = shipMarker;
 			this.shipString = shipString;
@@ -217,7 +203,7 @@ public class Gameboard {
 			return shipSize;
 		}
 		
-		public char getShipMarker() {
+		public int getShipMarker() {
 			return shipMarker;
 		}
 		
@@ -229,19 +215,28 @@ public class Gameboard {
 	// add ships from enum ship class to array list
 	// allows access in ship positioning method
 	public void createShipArray(){
+		//stores each ship length from enum
+		shipLengthArray.add(ships.AIRCRAFT.getShipLength()); 
+		shipLengthArray.add(ships.BATTLESHIP.getShipLength()); 
+		shipLengthArray.add(ships.DESTROYER.getShipLength()); 
+		shipLengthArray.add(ships.SUBMARINE.getShipLength()); 
+		shipLengthArray.add(ships.PATROL.getShipLength()); 
 		
-		shipArray.add(ships.AIRCRAFT.getShipLength()); 
-		shipArray.add(ships.BATTLESHIP.getShipLength()); 
-		shipArray.add(ships.DESTROYER.getShipLength()); 
-		shipArray.add(ships.SUBMARINE.getShipLength()); 
-		shipArray.add(ships.PATROL.getShipLength()); 
+		// stores each ship marker from enum
+		shipCharArray.add(ships.AIRCRAFT.getShipMarker());
+		shipCharArray.add(ships.BATTLESHIP.getShipMarker());
+		shipCharArray.add(ships.DESTROYER.getShipMarker());
+		shipCharArray.add(ships.SUBMARINE.getShipMarker());
+		shipCharArray.add(ships.PATROL.getShipMarker());
+		
 
-		System.out.print(shipArray.size());
-		System.out.println();
+		//System.out.print(shipLengthArray.size());
+		//System.out.println();
 		
-		for (int i = 0; i < shipArray.size(); i++) {
-		System.out.println(shipArray.get(i));
-		}
+		//for (int i = 0; i < shipLengthArray.size(); i++) {
+		//System.out.println(shipLengthArray.get(i));
+		//System.out.println(getLetter(shipCharArray.get(i)));
+		//}
 	}
 	
 	// method to position ships
@@ -249,59 +244,40 @@ public class Gameboard {
 	{
 		difficultyInfo();
 		createShipArray();
-		System.out.println("The board size is " + boardSize);
-		
-			int shipCounter = 0;
-			
-			boolean shipOnBoard = false;
+		//System.out.println("The board size is " + boardSize);
+					
+			boolean shipsOnBoard = false;
 			
 			
 				
 				//boolean placeHorizontal = rand.nextBoolean();
-				
-				//int row = rand.nextInt(boardSize);
+		while (!shipsOnBoard){		
+				// generate random number for ship placement, either vertical or horizontal starting place
 				int col = rand.nextInt(boardSize);
 				int row = rand.nextInt(boardSize);
-
 				
-				for (int j = 0; j < shipArray.size();j++) {
-
-					for (int i = 0; i < shipArray.get(j); i++) {
-					gameBoard[row][i+1] = 'A';		
-					System.out.println("j = " + j);
 				
+				//loops through arrayLists that hold enum values for shipSize and shipMarker
+				for (int j = 0; j < shipLengthArray.size();j++) {
+					
+					for (int i = 0; i < shipLengthArray.get(j); i++) {
+					gameBoard[row][i+1] = getLetter(shipCharArray.get(j));	
+					//System.out.println("j = " + j);
 					}
+					
+					// generate new random for next ship
+				
 					row = rand.nextInt(boardSize);
+					// if either row or column is not empty ('E') then start the iteration over again
+					//if (gameBoard[row][i+1] != 'E')
+						//continue;
 
 				}
+				shipsOnBoard = true;
+
+		}
 			
-			
-				/*
-				for (int j = 0; j < ships.BATTLESHIP.getShipLength(); j++) {
-					//int row = rand.nextInt(boardSize);
-					//int col = rand.nextInt(boardSize);
-					gameBoard[j+1][col] = ships.BATTLESHIP.getShipMarker();
-				}
-			
-				for (int j = 0; j < ships.DESTROYER.getShipLength(); j++) {
-					//int row = rand.nextInt(boardSize);
-					//int col = rand.nextInt(boardSize);
-					gameBoard[row][j + 1] = ships.DESTROYER.getShipMarker();
-				}
-				
-				for (int j = 0; j < ships.SUBMARINE.getShipLength(); j++) {
-					//int row = rand.nextInt(boardSize);
-				//	int col = rand.nextInt(boardSize);
-					gameBoard[j+1][col] = ships.SUBMARINE.getShipMarker();
-				}
-				
-				for (int j = 0; j < ships.PATROL.getShipLength(); j++) {
-					//int row = rand.nextInt(boardSize);
-					//int col = rand.nextInt(boardSize);
-					gameBoard[row][j + 1] = ships.PATROL.getShipMarker();
-				}
-				*/
-			
+
 		
 	 }
 	 
@@ -311,4 +287,6 @@ public class Gameboard {
 
 
 		
+
+	
 
