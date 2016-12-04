@@ -52,7 +52,7 @@ public class Gameboard {
 		fillBoard();
 		positionShips();
 		
-		System.out.print("     ");
+		System.out.print("   ");
 		for (int i = 0; i < gameBoard[0].length; i++) {
 			System.out.printf("%3d", i+1);
 
