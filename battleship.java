@@ -6,26 +6,20 @@ import java.util.Random;
 
 public class battleship {
 	
-	
+	//private static final char[][] ShipBoard = null;
+	static Gameboard gameboard1;
 	public static void main(String[] args) {
-		int size = 0;
-		int x=0;
-		char[][] gameBoard1 = null;
-		Random rand = new Random();
-		int temp = rand.nextInt(5) + 1;
-		ArrayList<String> location = new ArrayList<String>();
+		gameboard1 = new Gameboard();
 		
-		
-		
-		
-		Scanner input = new Scanner(System.in);
-		
-		Gameboard gameboard1 = new Gameboard();
-		
-		gameboard1.difficultyInfo();
+		//gameboard1.difficultyInfo();
+		// gameboard1.fillGameBoard();
 		gameboard1.outputGame();
-		
-		gameboard1.setShips(location);	
+		//gameboard1.outputGame();
+		// gameboard1.setShips(location);	
 
-  }
+		// gameboard1.setShipInfo();
+		
+		
+	}
+
 }
