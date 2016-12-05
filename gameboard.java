@@ -22,7 +22,11 @@ public class Gameboard {
 	private String shipString;
 	private Ships ships;
 	private int shotsFired = 0;
-	
+	private int Aircraft = 5;
+	private int Battleship = 4;
+	private int Destroyer = 3;
+	private int Submarine = 3;
+	private int Patrol = 2;
 
 	Random rand = new Random();
 	
@@ -96,9 +100,9 @@ public class Gameboard {
 	
 	public void endGame() {		
 		
-		//System.out.print(missiles);
-		//missiles = 3;
-		while (availableMissiles != 0) {
+		System.out.println(availableMissiles);
+		
+		while (availableMissiles != 0 && hits != 17) {
 			shotsFired++;
 			
 			System.out.println("Choose the coordinate to attack. Enter the row (LETTER) you wish to attack: ");
@@ -109,43 +113,88 @@ public class Gameboard {
 
 			int coord1 = getNumber(charInput);
 			
-			// ensures guess doesn't go off the board
-			//int row = input.nextInt() - 1;
-			
-			//create validation loop
-			
+					
 			System.out.println("Choose the column you want to attack (NUMBER): ");
 			int coord2 = input.nextInt() - 1;
+		
 			
-			//int col = input.nextInt() - 1;
-
+			if (gameBoard[coord1][coord2] == 'A') {
+				System.out.println(Aircraft);
+				Aircraft--;
+				System.out.println(Aircraft);
+				if (Aircraft == 0){
+					System.out.println("\n" + "You sunk the Aircraft Carrier!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'B') {
+				System.out.println(Battleship);
+				Battleship--;
+				System.out.println(Battleship);
+				if (Battleship == 0){
+					System.out.println("\n" + "You sunk the Battleship!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'D') {
+				System.out.println(Destroyer);
+				Destroyer--;
+				System.out.println(Destroyer);
+				if (Destroyer == 0){
+					System.out.println("\n" + "You sunk the Destroyer!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'S') {
+				System.out.println(Submarine);
+				Submarine--;
+				System.out.println(Submarine);
+				if (Submarine == 0){
+					System.out.println("\n" + "You sunk the Submarine!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'A') {
+				System.out.println(Patrol);
+				Patrol--;
+				System.out.println(Patrol);
+				if (Patrol == 0){
+					System.out.println("\n" + "You sunk the Patrol Boat!");
+				}
+			}
+			
 			for (int j = 0; j < shipLengthArray.size(); j++) {
 			// checks to see if it was a hit or a miss
 			for (int i = 0; i < shipLengthArray.get(j); i++) {
 				if (gameBoard[coord1][coord2] == getLetter(shipCharArray.get(j))) {
+					// convert to X when printing next board
 					gameBoard[coord1][coord2] = 2;
 				}
 			}
 		}
 			
-			boolean result;
+			
 			// check coordinate to see if it's empty
 			if (gameBoard[coord1][coord2] == 0) {
+				//convert to 1 to print * on next board
 				gameBoard[coord1][coord2] = 1;
 				System.out.println("miss");
-				result = false;
 				misses++;
 			} else if (gameBoard[coord1][coord2] == 2) {
+				//prints X on next board
+				
 				System.out.println("hit");
-				result = true;
 				hits++;
 			}
+			
 			
 			outputGame();
 			availableMissiles--;
 		}
+		
+		// Determine GAME OVER or WIN
+		if (availableMissiles == 0) {
+		System.out.println("You used up all your missiles :(");
+		System.out.println("--------GAME OVER--------");
+		} else if (hits == 17) {
+			System.out.println("CONGRATULATIONS! YOU WON!");
+		}
 	}
 	
+		
+	// conversion method to change letters to numbers for int[][] board
 	public int getNumber(char input) {
 		int row = 0;
 		
@@ -265,29 +314,7 @@ public class Gameboard {
 	}
 
 	
-	//SHIP CLASS
-	/*
-	
-	// method to check user's guess
-	public String checkGuess(String userGuess) {
-		String result = "miss";
-		// check to see if userGuess is inside location arrayList
-		int index = location.indexOf(userGuess);
-		
-		if (index >= 0){
-			location.remove(index);
-			if (location.isEmpty()) {
-				result = "kill";
-			} else {
-				result = "hit";
-			}
-		}
-		
-		System.out.println(result);
-		
-		return result;
-	}
-	*/
+	// SHIPS
 	
 	// method to track score
 	public int trackScore(int score) {
