@@ -6,41 +6,33 @@ import java.util.Scanner;
 
 public class Gameboard {
 	
-	// hits and misses
 	private int hits, misses;
 	private ArrayList<Integer> shipLengthArray = new ArrayList<Integer>();
 	private ArrayList<Integer> shipCharArray = new ArrayList<Integer>();
-	int guess;
 	private int level;
 	private int availableMissiles;
 	private int boardSize;
-	private char[][] gameBoard;
+	private int[][] gameBoard;
 	private int shipSize;
 	private int shipMarker;
-	private int ship;
 	private String shipString;
 	private Ships ships;
-	
+	private int shotsFired = 0;
+	private int Aircraft = 5;
+	private int Battleship = 4;
+	private int Destroyer = 3;
+	private int Submarine = 3;
+	private int Patrol = 2;
 
 	Random rand = new Random();
 	
-	// Scanner to retain user input
 	Scanner input = new Scanner(System.in);
 	
-	
-	//constructor for Gameboard
-
-	//public Gameboard(char[][] game){
-		//this.gameBoard = game;
-		//outputGame();
-	//}
-	
-
-	// initializing the whole board to empty ('E')
-	private void fillBoard() {
+	// initializing the whole board to empty (0)
+	public void fillBoard() {
 		for(int i = 0; i < boardSize; i++) {
 			for (int j = 0; j < boardSize; j++) {
-				gameBoard[i][j] = 'E';
+				gameBoard[i][j] = 0;
 			}
 		}
 	}
@@ -49,33 +41,190 @@ public class Gameboard {
 	// method to print board
 	public void outputGame() 
 	{ 
-		fillBoard();
-		positionShips();
+	
+		char water = '~';
+		char miss = '*';
+		char hit = 'X';
 		
 		System.out.print("   ");
 		for (int i = 0; i < gameBoard[0].length; i++) {
 			System.out.printf("%3d", i+1);
+			System.out.print("  ");
 
 		}
 		
 		System.out.println();
 		//loop through array's rows
-		for (int row = 0; row < gameBoard.length; row++)
+		for (int row = 0; row < gameBoard[0].length; row++)
 		{	
-			System.out.print(" ");
 			System.out.printf("%3c", getLetter(row+1));
+			
 	
 			// loop through columns of current row
 			for (int column = 0; column < gameBoard[0].length; column++) {
-				   // gameBoard[row][column] = '~';
+					if (gameBoard[row][column] == 0)
+						System.out.printf("%3c", water);
+					if (gameBoard[row][column] == 1)
+						System.out.printf("%3c", miss);
+					if (gameBoard[row][column] == 2)
+						System.out.printf("%3c", hit);
 					System.out.printf("%3c", gameBoard[row][column]);
 					
 				//System.out.print(gameBoard[row][column]);
 			}
+	
 			System.out.println();
 
 		}
 	}
+	
+	public void endGame() {		
+		
+		System.out.println(availableMissiles);
+		
+		while (availableMissiles != 0 && hits != 17) {
+			shotsFired++;
+			
+			System.out.println("Choose the coordinate to attack. Enter the row (LETTER) you wish to attack: ");
+			// convert letter to integer
+			String guess = input.next();
+			
+			char charInput = guess.charAt(0); 
+
+			int coord1 = getNumber(charInput);
+			
+					
+			System.out.println("Choose the column you want to attack (NUMBER): ");
+			int coord2 = input.nextInt() - 1;
+		
+			
+			if (gameBoard[coord1][coord2] == 'A') {
+				Aircraft--;
+				if (Aircraft == 0){
+					System.out.println("\n" + "You sunk the Aircraft Carrier!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'B') {
+				Battleship--;
+				if (Battleship == 0){
+					System.out.println("\n" + "You sunk the Battleship!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'D') {
+				System.out.println(Destroyer);
+				Destroyer--;
+				System.out.println(Destroyer);
+				if (Destroyer == 0){
+					System.out.println("\n" + "You sunk the Destroyer!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'S') {
+				Submarine--;
+				if (Submarine == 0){
+					System.out.println("\n" + "You sunk the Submarine!");
+				}
+			} else if (gameBoard[coord1][coord2] == 'P') {
+				Patrol--;
+				if (Patrol == 0){
+					System.out.println("\n" + "You sunk the Patrol Boat!");
+				}
+			}
+			
+			for (int j = 0; j < shipLengthArray.size(); j++) {
+			// checks to see if it was a hit or a miss
+			for (int i = 0; i < shipLengthArray.get(j); i++) {
+				if (gameBoard[coord1][coord2] == getLetter(shipCharArray.get(j))) {
+					// convert to X when printing next board
+					gameBoard[coord1][coord2] = 2;
+				}
+			}
+		}
+			
+			
+			// check coordinate to see if it's empty
+			if (gameBoard[coord1][coord2] == 0) {
+				//convert to 1 to print * on next board
+				gameBoard[coord1][coord2] = 1;
+				System.out.println("miss");
+				misses++;
+			} else if (gameBoard[coord1][coord2] == 2) {
+				//prints X on next board
+				
+				System.out.println("hit");
+				hits++;
+			}
+			
+			System.out.println("HITS: " + hits);
+			System.out.println("MISSES: " + misses);
+			System.out.println("REMAINING MISSILES: " + availableMissiles);
+			outputGame();
+			availableMissiles--;
+		}
+		
+		// Determine GAME OVER or WIN
+		if (availableMissiles == 0) {
+		System.out.println("You used up all your missiles :(");
+		System.out.println("--------GAME OVER--------");
+		} else if (hits == 17) {
+			System.out.println("CONGRATULATIONS! YOU WON!");
+			System.out.println("--------STATS--------");
+		}
+		System.out.println("You fired " + shotsFired);
+		System.out.println("You missed " + misses);
+		System.out.println("You hit " + hits);
+		System.out.println("Total shots fired " + (shotsFired));
+		int average = (hits/shotsFired) * 100;
+		System.out.println("Average: " + average + "%");
+	}
+	
+		
+	// conversion method to change letters to numbers for int[][] board
+	public int getNumber(char input) {
+		int row = 0;
+		
+		switch(input){
+		case 'A':
+			row = 0;
+			break;
+		case 'B':
+			row = 1;
+			break;
+		case 'C':
+			row = 2;
+			break;
+		case 'D':
+			row = 3;
+			break;
+		case 'E':
+			row = 4;
+			break;
+		case 'F':
+			row = 5;
+			break;
+		case 'G':
+			row = 6;
+			break;
+		case 'H':
+			row = 7;
+			break;
+		case 'I':
+			row = 8;
+			break;
+		case 'J':
+			row = 9;
+			break;
+		case 'K':
+			row = 10;
+			break;
+		case 'L':
+			row = 11;
+			break;
+		
+		}
+		
+		
+		return row;
+}
+
+	
+	
 	
 	// converts int to char for column
 	public char getLetter(int i){
@@ -110,7 +259,7 @@ public class Gameboard {
 				availableMissiles = 30;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Don't waste them.");
 				boardSize = 6;
-				gameBoard = new char[6][6];
+				gameBoard = new int[6][6];
 				
 			} else if (level == 2)
 			{
@@ -118,7 +267,7 @@ public class Gameboard {
 				availableMissiles = 50;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Best of luck!");
 				boardSize = 9;
-				gameBoard = new char[9][9];
+				gameBoard = new int[9][9];
 				
 			} else if (level == 3)
 			{
@@ -126,14 +275,13 @@ public class Gameboard {
 				availableMissiles = 75;
 				System.out.println("You have " + availableMissiles + " missiles to start with. Put those skills to good use.");
 				boardSize = 12;
-				gameBoard = new char[12][12];
+				gameBoard = new int[12][12];
 			}
 			System.out.println();
 	}
 	
-	public void set(char[][] gameBoard){
-		this.gameBoard=gameBoard;
-		return;
+	public void setBoard(int[][] board){
+		board = this.gameBoard;
 	}
 	
 	public int missiles(int bombs) {
@@ -147,36 +295,7 @@ public class Gameboard {
 	}
 
 	
-	//SHIP CLASS
-	/*
-	
-	// method to check user's guess
-	public String checkGuess(String userGuess) {
-		String result = "miss";
-		// check to see if userGuess is inside location arrayList
-		int index = location.indexOf(userGuess);
-		
-		if (index >= 0){
-			location.remove(index);
-			if (location.isEmpty()) {
-				result = "kill";
-			} else {
-				result = "hit";
-			}
-		}
-		
-		System.out.println(result);
-		
-		return result;
-	}
-	*/
-	
-	// method to track score
-	public int trackScore(int score) {
-		return score;
-	}
-	
-	
+	// SHIPS	
 	public enum Ships {
 		
 		// int shipMarker is later converted to char.
@@ -228,65 +347,58 @@ public class Gameboard {
 		shipCharArray.add(ships.DESTROYER.getShipMarker());
 		shipCharArray.add(ships.SUBMARINE.getShipMarker());
 		shipCharArray.add(ships.PATROL.getShipMarker());
-		
-
-		//System.out.print(shipLengthArray.size());
-		//System.out.println();
-		
-		//for (int i = 0; i < shipLengthArray.size(); i++) {
-		//System.out.println(shipLengthArray.get(i));
-		//System.out.println(getLetter(shipCharArray.get(i)));
-		//}
+	
 	}
 	
 	// method to position ships
 	public void positionShips() 
 	{
-		difficultyInfo();
-		createShipArray();
-		//System.out.println("The board size is " + boardSize);
-					
-			boolean shipsOnBoard = false;
 			
+			//loops through arrayLists that hold enum values for shipSize and shipMarker
+			for (int j = 0; j < shipLengthArray.size();j++) {
+				boolean shipsOnBoard = false;
 			
+			start:
+			while (!shipsOnBoard){		
 				
-				//boolean placeHorizontal = rand.nextBoolean();
-		while (!shipsOnBoard){		
+				boolean horizontal = rand.nextBoolean();
+
 				// generate random number for ship placement, either vertical or horizontal starting place
 				int col = rand.nextInt(boardSize);
 				int row = rand.nextInt(boardSize);
 				
-				
-				//loops through arrayLists that hold enum values for shipSize and shipMarker
-				for (int j = 0; j < shipLengthArray.size();j++) {
+				// ensure starting point of each ship is not taken up
+				if (gameBoard[row][col] != 0)
+					continue start;
+				if (horizontal) {
+					
 					
 					for (int i = 0; i < shipLengthArray.get(j); i++) {
-					gameBoard[row][i+1] = getLetter(shipCharArray.get(j));	
-					//System.out.println("j = " + j);
+					gameBoard[row][i+1] = getLetter(shipCharArray.get(j));
+					//if ((i+1) != 0) {
+						//continue;
+					//}
 					}
 					
-					// generate new random for next ship
+					
+					
+				} else { //vertically
+					
+					for (int i = 0; i < shipLengthArray.get(j); i++) {
+						gameBoard[i+1][col] = getLetter(shipCharArray.get(j));
+						//if ((i+1) != 0) {
+							//continue;
+						//}
+					}
 				
-					row = rand.nextInt(boardSize);
-					// if either row or column is not empty ('E') then start the iteration over again
-					//if (gameBoard[row][i+1] != 'E')
-						//continue;
-
-				}
+					
+					}
 				shipsOnBoard = true;
-
-		}
 			
-
+			} // end if else statement
+				
+		} // end while loop
+			
 		
-	 }
-	 
-
-
-}
-
-
-		
-
-	
-
+	 } // end for loop 
+	}
