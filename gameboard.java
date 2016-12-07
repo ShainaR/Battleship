@@ -94,12 +94,12 @@ public class Gameboard {
 			
 			// ensure input is upper case
 			guess = guess.toUpperCase();
-			System.out.println(guess);
+			//System.out.println(guess);
 			
 			char charInput = guess.charAt(0); 
 			
 			int coord1 = getNumber(charInput);
-			System.out.println(coord1);
+			//System.out.println(coord1);
 			
 			// ensure coord1 is within boardSize coordinates
 			if (coord1 < 1 || coord1 > boardSize){
@@ -447,7 +447,7 @@ public class Gameboard {
 				if (horizontal) {
 					
 					for (int i = 0; i < shipLengthArray.get(j); i++) {
-						System.out.println(gameBoard[row][i+1]);
+						// ensure entire space is free for ship
 						if (gameBoard[row][i+1] != 0) {
 							System.out.println("Searching!");
 							continue start;
