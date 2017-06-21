@@ -1,20 +1,16 @@
 package battleshipgame;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import java.util.Random;
 import java.util.Scanner;
 
 
 public class Gameboard {
 	
-	private int hits, misses;
+	private int hits, misses,level, availableMissiles, boardSize, shipSize, shipMarker;
 	private ArrayList<Integer> shipLengthArray = new ArrayList<Integer>();
 	private ArrayList<Integer> shipCharArray = new ArrayList<Integer>();
-	private int level;
-	private int availableMissiles;
-	private int boardSize;
 	private int[][] gameBoard;
-	private int shipSize;
-	private int shipMarker;
 	private String shipString;
 	private Ships ships;
 	private int shotsFired = 0;
@@ -27,6 +23,28 @@ public class Gameboard {
 	Random rand = new Random();
 	
 	Scanner input = new Scanner(System.in);
+	
+	public Gameboard(int[][] board, int bombs, int size){
+		board = this.gameBoard;
+		bombs = this.availableMissiles;
+		size = this.boardSize;
+	}
+	
+	public Gameboard() {
+		
+	}
+	
+	public int getMissiles(int bombs) {
+		return bombs;
+	}
+	
+	public int getBoardSize(int size) {
+		return size;
+	}
+	
+	public int[][] getBoard(int[][] board){
+		return board;
+	}
 	
 	// initializing the whole board to empty (0)
 	public void fillBoard() {
@@ -83,7 +101,7 @@ public class Gameboard {
 	// method to track hits, score and end game 
 	public void endGame() {		
 		
-		System.out.println(availableMissiles);
+		// System.out.println(availableMissiles);
 		
 		while (availableMissiles != 0 && hits != 17) {
 			shotsFired++;
@@ -94,13 +112,14 @@ public class Gameboard {
 			
 			// ensure input is upper case
 			guess = guess.toUpperCase();
-			//System.out.println(guess);
+			// System.out.println(guess);
 			
 			char charInput = guess.charAt(0); 
 			
 			int coord1 = getNumber(charInput);
-			//System.out.println(coord1);
+			System.out.println("Coord1 is " + coord1);
 			
+			System.out.println("Board size is" + boardSize);
 			// ensure coord1 is within boardSize coordinates
 			if (coord1 < 1 || coord1 > boardSize){
 				System.out.println("You did not enter a valid guess.");
@@ -113,13 +132,22 @@ public class Gameboard {
 			// prompt user to enter column coordinates
 			System.out.println("Choose the column you want to attack (NUMBER): ");
 			
+			//check to see if integer input is valid for coord2
+			if (!input.hasNextInt()) {
+				System.out.println("Invalid input!");
+				System.out.println("Enter an integer for your second coordinate: ");
+				input.next();
+				continue;
+			}
+			
 			// ensure coord2 places in correct spot
 			int coord2 = input.nextInt() - 1;
-			if (coord2 > boardSize || coord2 < 0) {
+			
+			if (coord2 < 0 || coord2 > boardSize-1) {
 				System.out.println("You did not enter a valid coordinate.");
 				continue;
 			}
-		
+			
 			
 			// determine which ship was sunk
 			if (gameBoard[coord1][coord2] == 'A') {
@@ -161,8 +189,7 @@ public class Gameboard {
 				}
 			}
 		}
-			
-			
+				
 			// check coordinate to see if it's empty
 			if (gameBoard[coord1][coord2] == 0) {
 				//convert to 1 to print * on next board
@@ -178,7 +205,7 @@ public class Gameboard {
 			
 			System.out.println("HITS: " + hits);
 			System.out.println("MISSES: " + misses);
-			System.out.println("REMAINING MISSILES: " + availableMissiles);
+			System.out.println("REMAINING MISSILES: " + (availableMissiles - 1));
 			outputGame();
 			availableMissiles--;
 		}
@@ -191,12 +218,9 @@ public class Gameboard {
 			System.out.println("CONGRATULATIONS! YOU WON!");
 			System.out.println("--------STATS--------");
 		}
-		System.out.println("You fired " + shotsFired);
-		System.out.println("You missed " + misses);
-		System.out.println("You hit " + hits);
-		System.out.println("Total shots fired " + (shotsFired));
-		int average = (hits/shotsFired) * 100;
-		System.out.println("Average: " + average + "%");
+		System.out.println("SHOTS FIRED " + shotsFired);
+		System.out.println("MISSES " + misses);
+		System.out.println("HITS " + hits);
 	}
 	
 		
@@ -347,20 +371,6 @@ public class Gameboard {
 			System.out.println();
 	}
 	
-	public void setBoard(int[][] board){
-		board = this.gameBoard;
-	}
-	
-	public int missiles(int bombs) {
-		bombs = this.availableMissiles;
-		return bombs;
-	}
-	
-	public int boardSize(int size) {
-		size = this.boardSize;
-		return size;
-	}
-
 	
 	// SHIPS	
 	public enum Ships {
@@ -424,9 +434,7 @@ public class Gameboard {
 			//loops through arrayLists that hold enum values for shipSize and shipMarker
 			for (int j = 0; j < shipLengthArray.size();j++) {
 				boolean shipsOnBoard = false;
-				
-				boolean spaceFree = false;
-			
+							
 			start:
 			while (!shipsOnBoard){		
 				
@@ -447,9 +455,9 @@ public class Gameboard {
 				if (horizontal) {
 					
 					for (int i = 0; i < shipLengthArray.get(j); i++) {
-						// ensure entire space is free for ship
+					//	System.out.println(gameBoard[row][i+1]);
 						if (gameBoard[row][i+1] != 0) {
-							System.out.println("Searching!");
+							// System.out.println("Searching for an empty spot!");
 							continue start;
 						} else {
 						gameBoard[row][i+1] = getLetter(shipCharArray.get(j));
@@ -461,9 +469,9 @@ public class Gameboard {
 				} else { //vertically
 					
 					for (int i = 0; i < shipLengthArray.get(j); i++) {
-						System.out.println(gameBoard[row][i+1]);
+					//	System.out.println(gameBoard[row][i+1]);
 						if (gameBoard[i+1][col] != 0) {
-							System.out.println("Searching!");
+							//System.out.println("Searching for an empty spot!");
 
 							continue start;
 						} else {
@@ -474,9 +482,9 @@ public class Gameboard {
 					
 				}
 				
+				// this is only true if all ships place without overlapping
 				shipsOnBoard = true;
 			
-				//}// end space free
 			} // end if else statement
 				
 				
