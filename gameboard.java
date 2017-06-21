@@ -30,9 +30,7 @@ public class Gameboard {
 		size = this.boardSize;
 	}
 	
-	public Gameboard() {
-		
-	}
+	public Gameboard() {}
 	
 	public int getMissiles(int bombs) {
 		return bombs;
